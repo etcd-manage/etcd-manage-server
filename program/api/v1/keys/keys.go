@@ -20,7 +20,7 @@ func (api *KeysController) List(c *gin.Context) {
 	defer func() {
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"msg": err,
+				"msg": err.Error(),
 			})
 		}
 	}()

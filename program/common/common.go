@@ -37,7 +37,7 @@ func PathExists(path string) (bool, error) {
 // GetEtcdClientByGinContext 获取一个etcd客户端 从gin请求上下文
 func GetEtcdClientByGinContext(c *gin.Context) (client model.EtcdSdk, err error) {
 	clientI, exists := c.Get("CLIENT")
-	if exists == false {
+	if exists == false || clientI == nil {
 		err = errors.New("Etcd client is empty")
 		return
 	}

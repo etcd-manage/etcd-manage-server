@@ -11,6 +11,7 @@ import (
 	v1 "github.com/etcd-manage/etcd-manage-server/program/api/v1"
 	"github.com/etcd-manage/etcd-manage-server/program/config"
 	"github.com/etcd-manage/etcd-manage-server/program/logger"
+	"github.com/etcd-manage/etcd-manage-server/program/models"
 )
 
 // Program 主程序
@@ -30,6 +31,12 @@ func New() (*Program, error) {
 
 	// 日志对象
 	_, err = logger.InitLogger(cfg.LogPath, cfg.Debug)
+	if err != nil {
+		return nil, err
+	}
+
+	// 连接数据库
+	err = models.InitClient(cfg.DB)
 	if err != nil {
 		return nil, err
 	}

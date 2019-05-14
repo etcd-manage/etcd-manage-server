@@ -23,6 +23,7 @@ func (p *Program) startAPI() {
 
 	// 跨域问题
 	router.Use(p.middlewareCORS())
+	router.Use(p.middlewareEtcdClient())
 
 	// 设置静态文件目录
 	router.GET("/ui/*w", p.handlerStatic)
@@ -92,6 +93,10 @@ func (p *Program) middlewareEtcdClient() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		etcdId := c.GetHeader("EtcdID")
 		log.Println("当前请求EtcdId", etcdId)
+		if etcdId == "" {
+			// TODO 判断api地址前缀，不是ui则提示错误
+			return
+		}
 		etcdIdNum, _ := strconv.Atoi(etcdId)
 		etcdOne := new(models.EtcdServersModel)
 		etcdOne, err := etcdOne.FirstById(int32(etcdIdNum))
