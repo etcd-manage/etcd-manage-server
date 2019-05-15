@@ -15,4 +15,10 @@ func (v1 *APIV1) Register(router *gin.RouterGroup) {
 	gx := router.Group("/keys")
 	keysController := new(keys.KeysController)
 	gx.GET("", keysController.List)
+	gx.POST("", keysController.Add)
+	gx.PUT("", keysController.Put)
+	gx.DELETE("", keysController.Del)
+	// etcd服务列表
+	gx.GET("/members", keysController.Members)
+
 }
