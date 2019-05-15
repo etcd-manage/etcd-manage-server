@@ -94,7 +94,6 @@ func (p *Program) middlewareEtcdClient() gin.HandlerFunc {
 		etcdId := c.GetHeader("EtcdID")
 		log.Println("当前请求EtcdId", etcdId)
 		if etcdId == "" {
-			// TODO 判断api地址前缀，不是ui则提示错误
 			return
 		}
 		etcdIdNum, _ := strconv.Atoi(etcdId)
