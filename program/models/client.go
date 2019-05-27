@@ -33,6 +33,9 @@ func InitClient(dbCfg *config.MySQLConfig) (err error) {
 	if err != nil {
 		return
 	}
+	if dbCfg.Debug == true {
+		db.Debug()
+	}
 	// 禁用表名多元化
 	db.SingularTable(true)
 	// 连接池最大连接数

@@ -42,6 +42,29 @@ func (api *KeysController) List(c *gin.Context) {
 	c.JSON(http.StatusOK, list)
 }
 
+// Val 获取一个key的值
+func (api *KeysController) Val(c *gin.Context) {
+	path := c.Query("path")
+	log.Println(path)
+	var err error
+	defer func() {
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"msg": err.Error(),
+			})
+		}
+	}()
+	client, err := common.GetEtcdClientByGinContext(c)
+	if err != nil {
+		return
+	}
+	list, err := client.Val(path)
+	if err != nil {
+		return
+	}
+	c.JSON(http.StatusOK, list)
+}
+
 // Add 添加key
 func (api *KeysController) Add(c *gin.Context) {
 	req := new(ReqKeyBody)

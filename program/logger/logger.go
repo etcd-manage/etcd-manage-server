@@ -5,7 +5,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/shiguanghuxian/etcd-manage/program/common"
 	"go.uber.org/zap"
@@ -26,12 +25,10 @@ func InitLogger(logPath string, isDebug bool) (*zap.SugaredLogger, error) {
 		if isExt, _ := common.PathExists(logRoot); isExt == false {
 			os.MkdirAll(logRoot, os.ModePerm)
 		}
-		infoLogPath = logRoot + time.Now().Format("20060102") + ".log"
-		// errorLogPath = logRoot + time.Now().Format("20060102_error") + ".log"
+		infoLogPath = logRoot + "access.log"
 	} else {
 		logPath = strings.TrimRight(logPath, string(os.PathSeparator))
-		infoLogPath = logPath + string(os.PathSeparator) + time.Now().Format("20060102") + ".log"
-		// errorLogPath = logPath + string(os.PathSeparator) + time.Now().Format("20060102_error") + ".log"
+		infoLogPath = logPath + string(os.PathSeparator) + "access.log"
 	}
 
 	// 兼容win根完整路径问题
@@ -47,7 +44,6 @@ func InitLogger(logPath string, isDebug bool) (*zap.SugaredLogger, error) {
 	if isDebug == true {
 		atom.SetLevel(zapcore.DebugLevel)
 		cfg.OutputPaths = []string{"stdout"}
-		// cfg.ErrorOutputPaths = []string{"stdout"}
 	} else {
 		atom.SetLevel(zapcore.InfoLevel)
 		if runtime.GOOS == "windows" {
@@ -55,7 +51,6 @@ func InitLogger(logPath string, isDebug bool) (*zap.SugaredLogger, error) {
 		} else {
 			cfg.OutputPaths = []string{infoLogPath}
 		}
-		// cfg.ErrorOutputPaths = []string{errorLogPath}
 	}
 	cfg.Level = atom
 	logger, err := cfg.Build()
