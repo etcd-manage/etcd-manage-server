@@ -27,6 +27,27 @@ func (api *ServerController) List(c *gin.Context) {
 	c.JSON(http.StatusOK, list)
 }
 
+// Add 添加服务
+func (api *ServerController) Add(c *gin.Context) {
+	var err error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": err.Error(),
+		})
+	}
+	// 添加
+	req := new(models.EtcdServersModel)
+	err = c.Bind(req)
+	if err != nil {
+		return
+	}
+	err = req.Insert()
+	if err != nil {
+		return
+	}
+	c.JSON(http.StatusOK, "ok")
+}
+
 // Restore 修复v1版本或e3w对目录的标记
 func (api *ServerController) Restore(c *gin.Context) {
 	etcdId := c.Query("etcd_id")

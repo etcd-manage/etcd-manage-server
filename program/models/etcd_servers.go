@@ -32,3 +32,9 @@ func (m *EtcdServersModel) FirstById(id int32) (one *EtcdServersModel, err error
 	err = client.Model(m).Where("id = ?", id).First(one).Error
 	return
 }
+
+// Insert 添加
+func (m *EtcdServersModel) Insert() (err error) {
+	err = client.Create(m).Error
+	return
+}
