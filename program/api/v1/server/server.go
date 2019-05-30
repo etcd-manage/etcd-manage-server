@@ -18,7 +18,8 @@ type ServerController struct {
 
 // List 获取etcd服务列表，全部
 func (api *ServerController) List(c *gin.Context) {
-	list, err := new(models.EtcdServersModel).All()
+	name := c.Query("name")
+	list, err := new(models.EtcdServersModel).All(name)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": err.Error(),
@@ -45,6 +46,29 @@ func (api *ServerController) Add(c *gin.Context) {
 	if err != nil {
 		return
 	}
+	c.JSON(http.StatusOK, "ok")
+}
+
+// Update 修改服务
+func (api *ServerController) Update(c *gin.Context) {
+	var err error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": err.Error(),
+		})
+	}
+	// 添加
+	req := new(models.EtcdServersModel)
+	err = c.Bind(req)
+	if err != nil {
+		return
+	}
+	err = req.Update()
+	if err != nil {
+		return
+	}
+	// TODO 删除已存在的此服务连接
+
 	c.JSON(http.StatusOK, "ok")
 }
 

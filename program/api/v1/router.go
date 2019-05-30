@@ -29,6 +29,7 @@ func (v1 *APIV1) Register(router *gin.RouterGroup) {
 	gs := router.Group("/server")
 	gs.GET("", serverController.List)
 	gs.POST("", serverController.Add)
+	gs.PUT("", serverController.Update)
 	gs.GET("/restore", serverController.Restore)
 
 }
