@@ -17,6 +17,7 @@ type KeysController struct {
 type ReqKeyBody struct {
 	Path  string `json:"path"`
 	Value string `json:"value"`
+	IsDir bool   `json:"is_dir"`
 }
 
 // List 获取目录下key列表

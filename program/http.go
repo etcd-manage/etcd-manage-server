@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/etcd-manage/etcd-manage-server/program/cache"
 	"github.com/etcd-manage/etcd-manage-server/program/logger"
 	"github.com/etcd-manage/etcd-manage-server/program/models"
 	"github.com/etcd-manage/etcdsdk"
@@ -23,6 +25,7 @@ func (p *Program) startAPI() {
 
 	// 跨域问题
 	router.Use(p.middlewareCORS())
+	router.Use(p.middlewareAuth())
 	router.Use(p.middlewareEtcdClient())
 
 	// 设置静态文件目录
@@ -68,13 +71,36 @@ func (p *Program) startAPI() {
 
 }
 
+// middlewareAuth 获取是否登录
+func (p *Program) middlewareAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		u, _ := url.ParseRequestURI(c.Request.RequestURI)
+		if strings.HasPrefix(u.Path, "/v1/passport") == false {
+			log.Println(u.Path)
+			token := c.Request.Header.Get("Token")
+			if token == "" {
+				c.AbortWithStatus(http.StatusUnauthorized)
+				return
+			}
+			// 获取用户信息
+			key := cache.GetLoginKey(token)
+			val, exist := cache.DefaultMemCache.Get(key)
+			if exist == false {
+				c.AbortWithStatus(http.StatusUnauthorized)
+				return
+			}
+
+		}
+	}
+}
+
 // 跨域中间件
 func (p *Program) middlewareCORS() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
+		origin := c.Request.Header.Get("origin")
 		method := c.Request.Method
 
-		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Origin", origin)
 		c.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token, EtcdID")
 		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT")
 		c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
@@ -83,6 +109,7 @@ func (p *Program) middlewareCORS() gin.HandlerFunc {
 		//放行所有OPTIONS方法
 		if method == "OPTIONS" {
 			c.AbortWithStatus(http.StatusNoContent)
+			return
 		}
 		// 处理请求
 		c.Next()
