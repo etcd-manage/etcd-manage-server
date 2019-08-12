@@ -1,6 +1,8 @@
 package common
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
@@ -43,4 +45,17 @@ func GetEtcdClientByGinContext(c *gin.Context) (client model.EtcdSdk, err error)
 	}
 	client = clientI.(model.EtcdSdk)
 	return
+}
+
+// Md5Password 密码生成
+func Md5Password(password string) string {
+	salt := "etcd-manage"
+	return Md5(Md5(password) + Md5(salt))
+}
+
+// Md5 计算字符串md5值
+func Md5(s string) string {
+	h := md5.New()
+	h.Write([]byte(s))
+	return hex.EncodeToString(h.Sum(nil))
 }

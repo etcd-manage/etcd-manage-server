@@ -89,7 +89,7 @@ func (p *Program) middlewareAuth() gin.HandlerFunc {
 				c.AbortWithStatus(http.StatusUnauthorized)
 				return
 			}
-
+			log.Println(val)
 		}
 	}
 }

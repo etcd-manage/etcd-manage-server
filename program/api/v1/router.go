@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/etcd-manage/etcd-manage-server/program/api/v1/keys"
+	"github.com/etcd-manage/etcd-manage-server/program/api/v1/passport"
 	"github.com/etcd-manage/etcd-manage-server/program/api/v1/server"
 	gin "github.com/gin-gonic/gin"
 )
@@ -32,4 +33,8 @@ func (v1 *APIV1) Register(router *gin.RouterGroup) {
 	gs.PUT("", serverController.Update)
 	gs.GET("/restore", serverController.Restore)
 
+	// 认证中心
+	passportController := new(passport.PassportController)
+	gp := router.Group("/passport")
+	gp.POST("/login", passportController.Login)
 }
