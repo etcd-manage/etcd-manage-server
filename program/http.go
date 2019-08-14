@@ -1,6 +1,7 @@
 package program
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/jinzhu/gorm"
 
 	"github.com/etcd-manage/etcd-manage-server/program/cache"
 	"github.com/etcd-manage/etcd-manage-server/program/logger"
@@ -76,7 +79,7 @@ func (p *Program) middlewareAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		u, _ := url.ParseRequestURI(c.Request.RequestURI)
 		if strings.HasPrefix(u.Path, "/v1/passport") == false {
-			log.Println(u.Path)
+			// log.Println(u.Path)
 			token := c.Request.Header.Get("Token")
 			if token == "" {
 				c.AbortWithStatus(http.StatusUnauthorized)
@@ -86,10 +89,20 @@ func (p *Program) middlewareAuth() gin.HandlerFunc {
 			key := cache.GetLoginKey(token)
 			val, exist := cache.DefaultMemCache.Get(key)
 			if exist == false {
+				logger.Log.Warnw("用户登录信息不存在")
 				c.AbortWithStatus(http.StatusUnauthorized)
 				return
 			}
-			log.Println(val)
+			// 解析为用户登录信息
+			user := new(models.UsersModel)
+			err := json.Unmarshal([]byte(val), user)
+			if err != nil {
+				logger.Log.Warnw("用户登录信息解析json错误", "err", err)
+				c.AbortWithStatus(http.StatusUnauthorized)
+				return
+			}
+			// 存储用户信息到上下文
+			c.Set("userinfo", user)
 		}
 	}
 }
@@ -118,14 +131,58 @@ func (p *Program) middlewareCORS() gin.HandlerFunc {
 
 func (p *Program) middlewareEtcdClient() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// 过滤认证模块
+		u, _ := url.ParseRequestURI(c.Request.RequestURI)
+		if strings.HasPrefix(u.Path, "/v1/passport") == true {
+			return
+		}
+		// 读取etcdID
 		etcdId := c.GetHeader("EtcdID")
 		log.Println("当前请求EtcdId", etcdId)
 		if etcdId == "" {
 			return
 		}
 		etcdIdNum, _ := strconv.Atoi(etcdId)
+		if etcdIdNum == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"msg": "请选择Etcd服务",
+			})
+			c.Abort()
+			return
+		}
+
+		// 查询角色权限 GET 请求为只读
+		userinfoObj, exist := c.Get("userinfo")
+		if exist == false {
+			logger.Log.Warnw("用户登录信息不存在")
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		userinfo := userinfoObj.(*models.UsersModel)
+		// get请求为读操作
+		typ := 1
+		if c.Request.Method == "GET" {
+			typ = 0
+		}
+		roleEtcdServer := new(models.RoleEtcdServersModel)
+		err := roleEtcdServer.FirstByRoleIdAndEtcdServerIdAndType(userinfo.RoleId, int32(etcdIdNum), int32(typ))
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"msg": "无权限进行此操作",
+				})
+			} else {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"msg": "数据库查询错误",
+				})
+			}
+			c.Abort()
+			return
+		}
+
+		// 查询etcd服务信息
 		etcdOne := new(models.EtcdServersModel)
-		etcdOne, err := etcdOne.FirstById(int32(etcdIdNum))
+		etcdOne, err = etcdOne.FirstById(int32(etcdIdNum))
 		if err != nil {
 			logger.Log.Errorw("获取etcd服务信息错误", "EtcdID", etcdId, "err", err)
 		}

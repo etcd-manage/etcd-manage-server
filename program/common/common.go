@@ -40,7 +40,7 @@ func PathExists(path string) (bool, error) {
 func GetEtcdClientByGinContext(c *gin.Context) (client model.EtcdSdk, err error) {
 	clientI, exists := c.Get("CLIENT")
 	if exists == false || clientI == nil {
-		err = errors.New("Etcd client is empty")
+		err = errors.New("Etcd service connection error")
 		return
 	}
 	client = clientI.(model.EtcdSdk)
