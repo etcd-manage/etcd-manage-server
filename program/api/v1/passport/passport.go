@@ -46,6 +46,10 @@ func (api *PassportController) Login(c *gin.Context) {
 	err = user.FirstByUsernameAndPassword(req.Username, req.Password)
 	if err != nil {
 		logger.Log.Errorw("登录查询用户错误", "err", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "用户名或密码错误",
+		})
+		return
 	}
 	user.Password = ""
 	user.Token = uuid.New().String()

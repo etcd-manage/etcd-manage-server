@@ -78,7 +78,7 @@ func (p *Program) startAPI() {
 func (p *Program) middlewareAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		u, _ := url.ParseRequestURI(c.Request.RequestURI)
-		if strings.HasPrefix(u.Path, "/v1/passport") == false {
+		if strings.HasPrefix(u.Path, "/v1/passport") == false && strings.HasPrefix(u.Path, "/ui") == false {
 			// log.Println(u.Path)
 			token := c.Request.Header.Get("Token")
 			if token == "" {
@@ -133,7 +133,7 @@ func (p *Program) middlewareEtcdClient() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 过滤认证模块
 		u, _ := url.ParseRequestURI(c.Request.RequestURI)
-		if strings.HasPrefix(u.Path, "/v1/passport") == true {
+		if strings.HasPrefix(u.Path, "/v1/passport") == true || strings.HasPrefix(u.Path, "/ui") == true {
 			return
 		}
 		// 读取etcdID
