@@ -7,17 +7,19 @@ import (
 
 // EtcdServersModel etcd 服务列表
 type EtcdServersModel struct {
-	ID        int32  `json:"id" gorm:"column:id;primary_key"`
-	Version   string `json:"version" gorm:"column:version"`
-	Name      string `json:"name" gorm:"column:name"`
-	Address   string `json:"address" gorm:"column:address"`
-	TlsEnable string `json:"tls_enable" gorm:"column:tls_enable"`
-	CertFile  string `json:"cert_file" gorm:"column:cert_file"`
-	KeyFile   string `json:"key_file" gorm:"column:key_file"`
-	CaFile    string `json:"ca_file" gorm:"column:ca_file"`
-	Username  string `json:"username" gorm:"column:username"`
-	Password  string `json:"password" gorm:"column:password"`
-	Desc      string `json:"desc" gorm:"column:desc"`
+	ID        int32    `json:"id" gorm:"column:id;primary_key"`
+	Version   string   `json:"version" gorm:"column:version"`
+	Name      string   `json:"name" gorm:"column:name"`
+	Address   string   `json:"address" gorm:"column:address"`
+	TlsEnable string   `json:"tls_enable" gorm:"column:tls_enable"`
+	CertFile  string   `json:"cert_file" gorm:"column:cert_file"`
+	KeyFile   string   `json:"key_file" gorm:"column:key_file"`
+	CaFile    string   `json:"ca_file" gorm:"column:ca_file"`
+	Username  string   `json:"username" gorm:"column:username"`
+	Password  string   `json:"password" gorm:"column:password"`
+	Desc      string   `json:"desc" gorm:"column:desc"`
+	CreatedAt JSONTime `gorm:"column:created_at" json:"created_at"` // 添加时间
+	UpdatedAt JSONTime `gorm:"column:updated_at" json:"updated_at"` // 更新时间
 }
 
 // TableName 表名

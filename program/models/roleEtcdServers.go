@@ -1,8 +1,6 @@
 package models
 
 import (
-	"time"
-
 	"github.com/jinzhu/gorm"
 )
 
@@ -13,12 +11,12 @@ const (
 
 // RoleEtcdServersModel 角色权限表
 type RoleEtcdServersModel struct {
-	Id           int32     `gorm:"column:id;primary_key" json:"id"`             //
-	EtcdServerId int32     `gorm:"column:etcd_server_id" json:"etcd_server_id"` // etcd服务id
-	Type         int32     `gorm:"column:type" json:"type"`                     // 0读 1写
-	RoleId       int32     `gorm:"column:role_id" json:"role_id"`               // 角色id
-	CreatedAt    time.Time `gorm:"column:created_at" json:"created_at"`         // 添加时间
-	UpdatedAt    time.Time `gorm:"column:updated_at" json:"updated_at"`         // 更新时间
+	Id           int32    `gorm:"column:id;primary_key" json:"id"`             //
+	EtcdServerId int32    `gorm:"column:etcd_server_id" json:"etcd_server_id"` // etcd服务id
+	Type         int32    `gorm:"column:type" json:"type"`                     // 0读 1写
+	RoleId       int32    `gorm:"column:role_id" json:"role_id"`               // 角色id
+	CreatedAt    JSONTime `gorm:"column:created_at" json:"created_at"`         // 添加时间
+	UpdatedAt    JSONTime `gorm:"column:updated_at" json:"updated_at"`         // 更新时间
 
 }
 
