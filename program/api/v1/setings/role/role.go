@@ -41,7 +41,7 @@ func (s *RoleController) Add(c *gin.Context) {
 	req.CreatedAt = now
 	req.UpdatedAt = now
 	req.Id = 0
-	err := req.Save()
+	err = req.Save()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": err.Error(),
@@ -90,7 +90,7 @@ func (s *RoleController) Up(c *gin.Context) {
 	}
 	now := models.JSONTime(time.Now())
 	req.UpdatedAt = now
-	err := req.Save()
+	err = req.Save()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": err.Error(),

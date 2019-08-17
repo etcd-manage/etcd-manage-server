@@ -26,3 +26,54 @@ func (m *UsersModel) FirstByUsernameAndPassword(username, password string) (err 
 	err = client.Table(m.TableName()).Where("username = ? and password = ?", username, password).First(m).Error
 	return
 }
+
+// List 分页列表
+func (m *UsersModel) List(userId, roleId int32, name string, offset, limit int) (list []*UsersModel, err error) {
+	where, params := m.listWhere(userId, roleId, name, offset, limit)
+	err = client.Table(m.TableName()).Where(where, params...).Offset(offset).Limit(limit).Scan(&list).Error
+	return
+}
+
+// ListCount 分页总数据量
+func (m *UsersModel) ListCount(userId, roleId int32, name string, offset, limit int) (_c int32, err error) {
+	where, params := m.listWhere(userId, roleId, name, offset, limit)
+	err = client.Table(m.TableName()).Where(where, params...).Count(&_c).Error
+	return
+}
+
+// 分页查询条件组织
+func (m *UsersModel) listWhere(userId, roleId int32, name string, offset, limit int) (where string, params []interface{}) {
+	where = ""
+	params = make([]interface{}, 0)
+	if userId > 0 {
+		where = "id = ? "
+		params = append(params, userId)
+	}
+	if roleId > 0 {
+		if where != "" {
+			where += " and "
+		}
+		where += " role_id = ? "
+		params = append(params, roleId)
+	}
+	if name != "" {
+		if where != "" {
+			where += " and "
+		}
+		where += " username like ?"
+		params = append(params, "%"+name+"%")
+	}
+	return
+}
+
+// Save 保存
+func (m *UsersModel) Save() (err error) {
+	err = client.Table(m.TableName()).Save(m).Error
+	return
+}
+
+// Del 删除
+func (m *UsersModel) Del(id int32) (err error) {
+	err = client.Table(m.TableName()).Where("id = ?", id).Delete(m).Error
+	return
+}

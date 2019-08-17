@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/etcd-manage/etcdsdk/model"
 	"github.com/gin-gonic/gin"
@@ -58,4 +59,11 @@ func Md5(s string) string {
 	h := md5.New()
 	h.Write([]byte(s))
 	return hex.EncodeToString(h.Sum(nil))
+}
+
+// GetHttpToInt 获取请求参数，转为int
+func GetHttpToInt(c *gin.Context, name string) int {
+	valStr := c.Query(name)
+	val, _ := strconv.Atoi(valStr)
+	return val
 }
