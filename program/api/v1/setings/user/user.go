@@ -81,7 +81,7 @@ func (s *UserController) Add(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-// Del 删除角色
+// Del 删除
 func (s *UserController) Del(c *gin.Context) {
 	id := c.Query("id")
 	idNum, _ := strconv.Atoi(id)
@@ -101,8 +101,8 @@ func (s *UserController) Del(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-// Up 修改角色
-func (s *UserController) Up(c *gin.Context) {
+// Up 修改
+func (s *UserController) Update(c *gin.Context) {
 	req := new(models.UsersModel)
 	err := c.Bind(req)
 	if err != nil {

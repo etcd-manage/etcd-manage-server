@@ -1,4 +1,4 @@
-package setings
+package role
 
 import (
 	"net/http"
@@ -73,7 +73,7 @@ func (s *RoleController) Del(c *gin.Context) {
 }
 
 // Up 修改角色
-func (s *RoleController) Up(c *gin.Context) {
+func (s *RoleController) Update(c *gin.Context) {
 	req := new(models.RolesModel)
 	err := c.Bind(req)
 	if err != nil {

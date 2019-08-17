@@ -4,6 +4,8 @@ import (
 	"github.com/etcd-manage/etcd-manage-server/program/api/v1/keys"
 	"github.com/etcd-manage/etcd-manage-server/program/api/v1/passport"
 	"github.com/etcd-manage/etcd-manage-server/program/api/v1/server"
+	"github.com/etcd-manage/etcd-manage-server/program/api/v1/setings/role"
+	"github.com/etcd-manage/etcd-manage-server/program/api/v1/setings/user"
 	gin "github.com/gin-gonic/gin"
 )
 
@@ -37,4 +39,20 @@ func (v1 *APIV1) Register(router *gin.RouterGroup) {
 	passportController := new(passport.PassportController)
 	gp := router.Group("/passport")
 	gp.POST("/login", passportController.Login)
+
+	// 角色
+	roleController := new(role.RoleController)
+	rs := router.Group("/role")
+	rs.GET("", roleController.All)
+	rs.POST("", roleController.Add)
+	rs.PUT("", roleController.Update)
+	rs.DELETE("", roleController.Del)
+
+	// 用户
+	userController := new(user.UserController)
+	us := router.Group("/user")
+	us.GET("", userController.List)
+	us.POST("", userController.Add)
+	us.PUT("", userController.Update)
+	us.DELETE("", userController.Del)
 }
