@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -21,6 +23,12 @@ func (UsersModel) TableName() string {
 	return gorm.DefaultTableNameHandler(nil, "users")
 }
 
+// UsersJoinRoleModel 用户列表带角色名
+type UsersJoinRoleModel struct {
+	RoleName string `gorm:"column:role_name" json:"role_name"`
+	UsersModel
+}
+
 // FirstByUsernameAndPassword 根据用户名密码查询数据
 func (m *UsersModel) FirstByUsernameAndPassword(username, password string) (err error) {
 	err = client.Table(m.TableName()).Where("username = ? and password = ?", username, password).First(m).Error
@@ -30,7 +38,12 @@ func (m *UsersModel) FirstByUsernameAndPassword(username, password string) (err 
 // List 分页列表
 func (m *UsersModel) List(userId, roleId int32, name string, offset, limit int) (list []*UsersModel, err error) {
 	where, params := m.listWhere(userId, roleId, name, offset, limit)
-	err = client.Table(m.TableName()).Where(where, params...).Offset(offset).Limit(limit).Scan(&list).Error
+	err = client.Table(m.TableName()+" as u").Select("u.*, r.name as role_name").
+		Joins(fmt.Sprintf("left join %s as r on u.role_id = r.id", new(RolesModel).TableName())).
+		Where(where, params...).
+		Offset(offset).
+		Limit(limit).
+		Scan(&list).Error
 	return
 }
 
