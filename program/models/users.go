@@ -50,7 +50,7 @@ func (m *UsersModel) List(userId, roleId int32, name string, offset, limit int) 
 // ListCount 分页总数据量
 func (m *UsersModel) ListCount(userId, roleId int32, name string, offset, limit int) (_c int32, err error) {
 	where, params := m.listWhere(userId, roleId, name, offset, limit)
-	err = client.Table(m.TableName()).Where(where, params...).Count(&_c).Error
+	err = client.Table(m.TableName()+" as u").Where(where, params...).Count(&_c).Error
 	return
 }
 
@@ -59,21 +59,21 @@ func (m *UsersModel) listWhere(userId, roleId int32, name string, offset, limit 
 	where = ""
 	params = make([]interface{}, 0)
 	if userId > 0 {
-		where = "id = ? "
+		where = "u.id = ? "
 		params = append(params, userId)
 	}
 	if roleId > 0 {
 		if where != "" {
 			where += " and "
 		}
-		where += " role_id = ? "
+		where += " u.role_id = ? "
 		params = append(params, roleId)
 	}
 	if name != "" {
 		if where != "" {
 			where += " and "
 		}
-		where += " username like ?"
+		where += " u.username like ?"
 		params = append(params, "%"+name+"%")
 	}
 	return

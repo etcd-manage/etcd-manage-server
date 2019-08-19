@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -28,5 +30,37 @@ func (RoleEtcdServersModel) TableName() string {
 // FirstByRoleIdAndEtcdServerIdAndType 根据role_id、etcd_server_id和type查询一条数据
 func (m *RoleEtcdServersModel) FirstByRoleIdAndEtcdServerIdAndType(roleId, etcdServerId, typ int32) (err error) {
 	err = client.Table(m.TableName()).Where("role_id = ? and etcd_server_id = ? and type >= ?", roleId, etcdServerId, typ).First(m).Error
+	return
+}
+
+// UpByEtcdId 根据etcd_id更新角色
+func (m *RoleEtcdServersModel) UpByEtcdId(etcdId int32, roles map[int32]int32) (err error) {
+	tx := client.Begin()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+	// 先删除再插入
+	err = tx.Table(m.TableName()).Where("etcd_server_id = ?", etcdId).Delete(m).Error
+	if err != nil {
+		return
+	}
+	now := JSONTime(time.Now())
+	for roleId, typ := range roles {
+		one := &RoleEtcdServersModel{
+			EtcdServerId: etcdId,
+			RoleId:       roleId,
+			Type:         typ,
+			CreatedAt:    now,
+			UpdatedAt:    now,
+		}
+		err = tx.Create(one).Error
+		if err != nil {
+			return
+		}
+	}
 	return
 }
