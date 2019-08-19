@@ -23,7 +23,7 @@ func (t *JSONTime) UnmarshalJSON(data []byte) (err error) {
 func (t JSONTime) MarshalJSON() ([]byte, error) {
 	b := make([]byte, 0, len(timeFormart)+2)
 	b = append(b, '"')
-	b = time.Time(t).AppendFormat(b, timeFormart)
+	b = time.Time(t).Local().AppendFormat(b, timeFormart)
 	b = append(b, '"')
 	return b, nil
 }

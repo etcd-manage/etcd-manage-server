@@ -3,6 +3,7 @@ package user
 import (
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/etcd-manage/etcd-manage-server/program/common"
@@ -49,6 +50,10 @@ func (s *UserController) List(c *gin.Context) {
 		logger.Log.Errorw("查询用户总数错误", "err", err)
 		return
 	}
+	// 去除密码
+	for _, v := range list {
+		v.Password = ""
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"list":  list,
@@ -66,6 +71,20 @@ func (s *UserController) Add(c *gin.Context) {
 		})
 		return
 	}
+	if req.RoleId <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "请选择角色角色",
+		})
+		return
+	}
+	req.Password = strings.TrimSpace(req.Password)
+	if len(req.Password) < 6 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "密码长度不能小于6",
+		})
+		return
+	}
+	req.Password = common.Md5Password(req.Password)
 	now := models.JSONTime(time.Now())
 	req.CreatedAt = now
 	req.UpdatedAt = now
@@ -117,9 +136,24 @@ func (s *UserController) Update(c *gin.Context) {
 		})
 		return
 	}
+	req.Password = strings.TrimSpace(req.Password)
+	omit := make([]string, 0)
+	omit = append(omit, "created_at")
+	if req.Password != "" {
+		if len(req.Password) < 6 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"msg": "密码长度不能小于6",
+			})
+			return
+		}
+		req.Password = common.Md5Password(req.Password)
+	} else {
+		omit = append(omit, "password")
+	}
+
 	now := models.JSONTime(time.Now())
 	req.UpdatedAt = now
-	err = req.Save()
+	err = req.Save(omit...)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": err.Error(),

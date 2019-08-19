@@ -6,6 +6,7 @@ import (
 	"github.com/etcd-manage/etcd-manage-server/program/api/v1/server"
 	"github.com/etcd-manage/etcd-manage-server/program/api/v1/setings/role"
 	"github.com/etcd-manage/etcd-manage-server/program/api/v1/setings/user"
+	"github.com/etcd-manage/etcd-manage-server/program/api/v1/upload"
 	gin "github.com/gin-gonic/gin"
 )
 
@@ -55,4 +56,10 @@ func (v1 *APIV1) Register(router *gin.RouterGroup) {
 	us.POST("", userController.Add)
 	us.PUT("", userController.Update)
 	us.DELETE("", userController.Del)
+
+	// 文件上传
+	uploadController := new(upload.UploadController)
+	uus := router.Group("/upload")
+	uus.POST("/content", uploadController.UploadOutContent)
+
 }
