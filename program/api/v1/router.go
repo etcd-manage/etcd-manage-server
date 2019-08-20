@@ -36,6 +36,7 @@ func (v1 *APIV1) Register(router *gin.RouterGroup) {
 	gs.PUT("", serverController.Update)
 	gs.GET("/restore", serverController.Restore)
 	gs.POST("/roles", serverController.SetRoles)
+	gs.GET("/roles", serverController.GetRoles)
 
 	// 认证中心
 	passportController := new(passport.PassportController)

@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/etcd-manage/etcd-manage-server/program/common"
 	"github.com/etcd-manage/etcd-manage-server/program/models"
 	"github.com/etcd-manage/etcdsdk/etcdv3"
 	"github.com/etcd-manage/etcdsdk/model"
@@ -121,15 +122,9 @@ func (api *ServerController) Restore(c *gin.Context) {
 	c.JSON(http.StatusOK, "ok")
 }
 
-// SetRolesReq 设置角色请求参数
-type SetRolesReq struct {
-	EtcdId int32           `json:"etcd_id"`
-	Roles  map[int32]int32 `json:"roles` // 下标角色id值为 0只读或1读写
-}
-
 // SetRoles 设置etcd服务角色
 func (api *ServerController) SetRoles(c *gin.Context) {
-	req := new(SetRolesReq)
+	req := make([]*models.RoleEtcdServersModel, 0)
 	err := c.Bind(req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -137,8 +132,14 @@ func (api *ServerController) SetRoles(c *gin.Context) {
 		})
 		return
 	}
+	if len(req) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "未设置任何权限",
+		})
+		return
+	}
 	m := new(models.RoleEtcdServersModel)
-	err = m.UpByEtcdId(req.EtcdId, req.Roles)
+	err = m.UpByEtcdId(req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": err.Error(),
@@ -147,4 +148,24 @@ func (api *ServerController) SetRoles(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, "ok")
+}
+
+// GetRoles 获取etcd服务权限列表
+func (api *ServerController) GetRoles(c *gin.Context) {
+	etcdId := common.GetHttpToInt(c, "etcd_id")
+	if etcdId <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "参数错误",
+		})
+		return
+	}
+	list, err := new(models.RoleEtcdServersModel).AllByEtcdId(int32(etcdId))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, list)
 }
