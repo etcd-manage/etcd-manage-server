@@ -124,8 +124,8 @@ func (api *ServerController) Restore(c *gin.Context) {
 
 // SetRoles 设置etcd服务角色
 func (api *ServerController) SetRoles(c *gin.Context) {
-	req := make([]*models.RoleEtcdServersModel, 0)
-	err := c.Bind(req)
+	req := make([]*models.AllByEtcdIdData, 0)
+	err := c.Bind(&req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": err.Error(),

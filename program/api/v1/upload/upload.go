@@ -39,6 +39,6 @@ func (api *UploadController) UploadOutContent(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"content": string(content),
+		"content": content,
 	})
 }
