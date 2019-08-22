@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/etcd-manage/etcd-manage-server/program/common"
 	"github.com/etcd-manage/etcd-manage-server/program/models"
@@ -43,6 +44,7 @@ func (api *ServerController) Add(c *gin.Context) {
 	if err != nil {
 		return
 	}
+	req.CreatedAt = models.JSONTime(time.Now())
 	err = req.Insert()
 	if err != nil {
 		return
@@ -64,6 +66,7 @@ func (api *ServerController) Update(c *gin.Context) {
 	if err != nil {
 		return
 	}
+	req.UpdatedAt = models.JSONTime(time.Now())
 	err = req.Update()
 	if err != nil {
 		return
