@@ -127,3 +127,9 @@ func (m *RoleEtcdServersModel) AllByEtcdId(etcdId int32) (list []*AllByEtcdIdDat
 	}
 	return
 }
+
+// Save 保存角色信息
+func (m *RoleEtcdServersModel) Save() (err error) {
+	err = client.Table(m.TableName()).Create(m).Error
+	return
+}

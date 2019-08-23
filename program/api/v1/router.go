@@ -34,6 +34,7 @@ func (v1 *APIV1) Register(router *gin.RouterGroup) {
 	gs.GET("", serverController.List)
 	gs.POST("", serverController.Add)
 	gs.PUT("", serverController.Update)
+	gs.DELETE("", serverController.Del)
 	gs.GET("/restore", serverController.Restore)
 	gs.POST("/roles", serverController.SetRoles)
 	gs.GET("/roles", serverController.GetRoles)

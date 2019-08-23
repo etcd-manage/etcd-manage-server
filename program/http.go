@@ -133,7 +133,7 @@ func (p *Program) middlewareEtcdClient() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 过滤认证模块
 		u, _ := url.ParseRequestURI(c.Request.RequestURI)
-		if strings.HasPrefix(u.Path, "/v1/passport") == true || strings.HasPrefix(u.Path, "/ui") == true || strings.HasPrefix(u.Path, "/v1/upload") == true {
+		if strings.HasPrefix(u.Path, "/v1/passport") == true || strings.HasPrefix(u.Path, "/ui") == true || strings.HasPrefix(u.Path, "/v1/upload") == true || strings.HasPrefix(u.Path, "/v1/server") == true {
 			return
 		}
 		// 读取etcdID
