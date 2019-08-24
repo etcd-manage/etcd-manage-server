@@ -188,10 +188,11 @@ func (p *Program) middlewareEtcdClient() gin.HandlerFunc {
 		}
 		// 连接etcd
 		cfg := &model.Config{
+			EtcdId:    int32(etcdIdNum),
 			Version:   etcdOne.Version,
 			Address:   strings.Split(etcdOne.Address, ","),
 			TlsEnable: etcdOne.TlsEnable == "true",
-			CertFile:  etcdOne.CaFile,
+			CertFile:  etcdOne.CertFile,
 			KeyFile:   etcdOne.KeyFile,
 			CaFile:    etcdOne.CaFile,
 			Username:  etcdOne.Username,
@@ -200,6 +201,10 @@ func (p *Program) middlewareEtcdClient() gin.HandlerFunc {
 		client, err := etcdsdk.NewClientByConfig(cfg)
 		if err != nil {
 			logger.Log.Errorw("连接etcd服务错误", "EtcdID", etcdId, "config", cfg, "err", err)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"msg": err.Error(),
+			})
+			c.Abort()
 		}
 		c.Set("CLIENT", client)
 	}

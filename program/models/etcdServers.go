@@ -30,7 +30,7 @@ func (EtcdServersModel) TableName() string {
 // All 获取全部
 func (m *EtcdServersModel) All(name string, roleId int32) (list []*EtcdServersModel, err error) {
 	re := new(RoleEtcdServersModel).TableName()
-	err = client.Table(m.TableName()+" as e").Select("e.*").
+	err = client.Table(m.TableName()+" as e").Select("DISTINCT e.id, e.*").
 		Joins("LEFT JOIN "+re+" as re on re.etcd_server_id = e.id").
 		Where("e.name like ? and re.role_id = ?", fmt.Sprintf("%%%s%%", name), roleId).
 		Scan(&list).Error
@@ -62,5 +62,6 @@ func (m *EtcdServersModel) Update() (err error) {
 // Del 删除
 func (m *EtcdServersModel) Del(id int32) (err error) {
 	err = client.Table(m.TableName()).Where("id = ?", id).Delete(m).Error
+	new(RoleEtcdServersModel).DelByEtcdId(id)
 	return
 }

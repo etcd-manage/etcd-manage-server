@@ -133,3 +133,9 @@ func (m *RoleEtcdServersModel) Save() (err error) {
 	err = client.Table(m.TableName()).Create(m).Error
 	return
 }
+
+// DelByEtcdId 删除
+func (m *RoleEtcdServersModel) DelByEtcdId(etcdId int32) (err error) {
+	err = client.Table(m.TableName()).Where("etcd_server_id = ?", etcdId).Delete(m).Error
+	return
+}
