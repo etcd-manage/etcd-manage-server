@@ -13,7 +13,7 @@ port = 10280
 # 使用 Let's Encrypt 证书 - tls_enable为true优先使用本地证书模式
 tls_encrypt_enable = false
 # 域名列表
-tls_encrypt_domain_names = ["shiguanghuxian.com"]
+tls_encrypt_domain_names = ["your-domain.com"]
 
 # 是否启用tls
 tls_enable = false
@@ -27,7 +27,7 @@ key_file = "key_file"
 [db]
 ## 是否调试模式
 debug = true
-## 数据库连接地址
+## 数据库连接地址 - make docker_run 不可以是127.0.0.1
 address = "127.0.0.1"
 ## 数据库端口
 port = 3306
