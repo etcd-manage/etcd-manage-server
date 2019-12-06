@@ -207,5 +207,15 @@ func (p *Program) middlewareEtcdClient() gin.HandlerFunc {
 			c.Abort()
 		}
 		c.Set("CLIENT", client)
+		// 处理请求
+		c.Next()
+
+		defer func() {
+			// 请求结束关闭etcd连接
+			err = client.Close()
+			if err != nil {
+				logger.Log.Errorw("关闭etcd连接错误", "EtcdID", etcdId, "config", cfg, "err", err)
+			}
+		}()
 	}
 }
