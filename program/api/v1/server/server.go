@@ -37,6 +37,10 @@ func (api *ServerController) List(c *gin.Context) {
 			"msg": err.Error(),
 		})
 	}
+	for _, v := range list {
+		v.CaFile = ""
+		v.CertFile = ""
+	}
 	c.JSON(http.StatusOK, list)
 }
 
