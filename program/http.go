@@ -133,7 +133,11 @@ func (p *Program) middlewareEtcdClient() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 过滤认证模块
 		u, _ := url.ParseRequestURI(c.Request.RequestURI)
-		if strings.HasPrefix(u.Path, "/v1/passport") == true || strings.HasPrefix(u.Path, "/ui") == true || strings.HasPrefix(u.Path, "/v1/upload") == true || strings.HasPrefix(u.Path, "/v1/server") == true {
+		pathUri := strings.TrimLeft(u.Path, "/v1")
+		if strings.HasPrefix(pathUri, "/passport") ||
+			strings.HasPrefix(pathUri, "/ui") ||
+			strings.HasPrefix(pathUri, "/upload") ||
+			strings.HasPrefix(pathUri, "/server") {
 			return
 		}
 		// 读取etcdID
@@ -159,6 +163,13 @@ func (p *Program) middlewareEtcdClient() gin.HandlerFunc {
 			return
 		}
 		userinfo := userinfoObj.(*models.UsersModel)
+		// 如果角色是1切是系统设置，则允许访问
+		if strings.HasPrefix(u.Path, "/user") || strings.HasPrefix(u.Path, "/role") {
+			if userinfo.RoleId != 1 {
+				c.AbortWithStatus(http.StatusBadRequest)
+				return
+			}
+		}
 		// get请求为读操作
 		typ := 1
 		if c.Request.Method == "GET" {
